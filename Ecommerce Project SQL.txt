@@ -1,0 +1,144 @@
+E-commerce Sales & Customer Analysis
+
+Object:
+Analysis sales preformance, customer behavior, and product trends using SQL to 
+help business decision-making 
+
+Project Template:
+
+This project analyzes e-commerce sales ans customer analysis data using SQL. I used joins to combine customer, 
+order, and product data, CTEs for reusability, subqueries for filtering repeat customers, 
+and window functions to rank products within categories. 
+The insights help identify high-value customers and top-performing products.
+
+Database shema:
+Ecommerce
+
+Database 4 Tables:
+
+Customers
+Products
+Orders
+Orderitems
+
+Create Data base schema:
+
+create database E_commerce;
+
+use E_commerce;
+
+customers Table:
+
+create table customers (
+customer_id INT primary key,
+customer_name VARCHAR (100),
+city VARCHAR (50),
+signup_date DATE
+);
+
+products Table:
+
+create table products (
+product_id INT primary key,
+product_name VARCHAR (100),
+category VARCHAR (50),
+price DECIMAL(10,2)
+);
+
+Orders Table:
+
+create table orders (
+order_id INT primary key,
+customer_id INT,
+order_date DATE,
+total_amount DECIMAL(10,2)
+FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
+Order items Table:
+
+create table order_items (
+order_items_id INT primary key,
+order_id INT,
+product_id INT,
+quantity INT,
+FOREIGN KEY (order_id) REFERENCES orders(order_id),
+FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+Orders insert values:
+
+Products insert values:
+
+Customers insert values:
+
+Orders_items insert values:
+
+Queries:
+
+Total sales by months:
+
+select
+month(order_date) as month,
+sum(total_amount) as Total_sales
+from orders group by month(order_date)
+order by month;
+
+Top 5 customers by spentding:
+
+select
+c.customer_name,
+sum(o.total_amount) as Total_spent
+from customers c
+join orders o on c.customer_id = o.customer_id
+group by c.customer_name
+order by total_spent desc limit 5;
+
+Category wise revenue:
+select 
+p.category,
+sum(p.price * oi.quantity) as revenue
+from order_items oi
+join products p on oi.product_id = p.product_id
+group by p.category;
+
+Customers with more than 3 orders (subquery):
+select customer_id from orders 
+group by customer_id 
+having count(order_id) >3;
+
+Repeat Customers (CTE):
+
+with order_count as (
+select customer_id, count(order_id) as total_orders from orders
+group by customer_id
+)
+select * from order_count where total_orders >1;
+
+Top products per category (Window Function):
+
+SELECT category, product_name, total_quantity
+FROM (
+    SELECT 
+        p.category,
+        p.product_name,
+        SUM(oi.quantity) AS total_quantity,
+        RANK() OVER (PARTITION BY p.category ORDER BY SUM(oi.quantity) DESC) AS rnk
+    FROM order_items oi
+    JOIN products p ON oi.product_id = p.product_id
+    GROUP BY p.category, p.product_name
+) t
+WHERE rnk = 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
