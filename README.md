@@ -1,4 +1,5 @@
 E-Commerce Sales & Customer Analysis (SQL Project)
+
 📌 Project Overview
 
 This project focuses on analyzing e-commerce sales and customer data using MySQL. The goal is to extract meaningful business insights such as sales trends, top customers, and product performance using SQL queries and relational database concepts.
